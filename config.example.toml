@@ -1,0 +1,42 @@
+# Blue CLI Configuration Example
+# Copy this to ~/.config/blue-cli/config.toml and customize
+
+[api_keys]
+# Set your AI provider API key (required)
+openai = ""        # Get from https://platform.openai.com/api-keys
+anthropic = ""     # Get from https://console.anthropic.com/
+
+# External service API keys (optional)
+jira = ""          # Jira API token
+github = ""        # GitHub personal access token
+google = ""        # Google OAuth credentials
+
+[preferences]
+# General preferences
+verbose_mode = false
+quiet_mode = false
+ai_provider = "anthropic"  # Choose: "anthropic" or "openai" (default: anthropic)
+
+# Decision algorithm tuning
+intervention_threshold = 8    # Higher = fewer interventions (1-20)
+confidence_threshold = 70.0  # Minimum confidence to intervene (0-100)
+buffer_size = 10             # Number of events to buffer (5-20)
+
+[integrations.jira]
+enabled = false
+base_url = ""           # e.g., "https://company.atlassian.net"
+username = ""           # Your Jira username/email
+
+[integrations.github]
+enabled = false
+username = ""           # Your GitHub username
+repositories = []       # Repos to monitor, e.g., ["owner/repo1", "owner/repo2"]
+
+[integrations.google_drive]
+enabled = false
+credentials_path = ""   # Path to Google OAuth credentials.json
+folder_ids = []         # Specific folders to monitor (optional)
+
+[security]
+encrypt_sensitive_data = true
+require_confirmation_for_api_calls = true
