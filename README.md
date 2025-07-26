@@ -1,180 +1,444 @@
-# Blue CLI - Ambient Pair Programming Assistant
+# Blue - Ambient Intelligence for Developers
 
-Blue CLI is a Jarvis-like command-line application that acts as an ambient pair programming assistant. It monitors your codebase in real-time and provides proactive, conversational feedback about your code changes.
+> *"The best pair programmer is one who's always there, never intrusive, and speaks up exactly when you need them to."*
 
-## Features
+## Philosophy: Rethinking Developer-AI Interaction
 
-- **Real-time File Monitoring**: Watches your codebase for changes using efficient event-driven monitoring
-- **Intelligent Change Detection**: Recognizes meaningful code changes like new functions, significant line additions, etc.
-- **AI-Powered Insights**: Uses Claude 3.5 Sonnet to provide architectural suggestions and code quality feedback
-- **Conversational Interface**: Natural, bidirectional communication that feels like pair programming
-- **Color-Coded Output**: Easy-to-read terminal output with timestamps and color coding
-- **Multi-Agent Architecture**: Observer Agent for monitoring, Navigator Agent for reasoning
+Traditional AI coding assistants operate on a **request-response paradigm** - you ask, they answer. Blue represents a fundamental shift toward **ambient intelligence** - an AI system that understands your development context continuously and provides insights proactively, like an experienced colleague working alongside you.
 
-## Installation
+### The Ambient Coding Paradigm
 
-1. **Clone or download** the Blue CLI files to your local machine.
+**Traditional Approach:**
+- Interrupt your flow to ask questions
+- Context switching between coding and prompting
+- Static, one-off interactions
+- You drive all conversations
 
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+**Ambient Approach:**
+- AI observes your work patterns naturally
+- Insights emerge from your actual coding behavior  
+- Continuous contextual awareness
+- AI initiates conversations when valuable
+- Maintains development flow state
 
-3. **Set up your API key**:
-   - Copy `.env.example` to `.env`
-   - Add your Anthropic API key:
-     ```
-     ANTHROPIC_API_KEY=your_actual_api_key_here
-     ```
+### Core Principles
 
-## Usage
+1. **Non-Intrusive Observation**: Blue watches your codebase changes without interrupting your creative process
+2. **Contextual Intelligence**: Understanding emerges from accumulated observations, not isolated questions
+3. **Proactive Guidance**: The system speaks up when it recognizes patterns worth discussing
+4. **Conversational Continuity**: Maintains ongoing dialogue that builds on previous interactions
+5. **Flow Preservation**: Designed to enhance, not break, your development rhythm
 
-Run Blue CLI by pointing it to a directory you want to monitor:
+## Why Ambient Intelligence Matters
+
+Modern software development involves complex mental models, architectural decisions, and pattern recognition that unfold over hours or days, not single interactions. Blue captures this temporal dimension by:
+
+- **Learning your coding patterns** as they evolve across sessions
+- **Recognizing architectural decisions** in the context of your broader codebase
+- **Identifying emerging problems** before they become technical debt
+- **Suggesting optimizations** based on observed usage patterns
+- **Facilitating knowledge transfer** through contextual explanations
+
+## Architecture: Multi-Agent Ambient System
+
+Blue implements a **multi-agent architecture** designed for continuous operation:
+
+### Observer Agent
+- **Event-driven file monitoring** using filesystem watchers
+- **Semantic change detection** (not just file diffs)
+- **Pattern recognition** for architectural changes
+- **Context accumulation** across development sessions
+
+### Navigator Agent  
+- **Large Language Model integration** (Anthropic Claude, OpenAI GPT)
+- **Conversational state management** 
+- **Proactive insight generation**
+- **Interactive dialogue handling**
+
+### Coordinator System
+- **Agent orchestration** and communication
+- **Real-time stream processing**
+- **Session state persistence**
+- **Graceful error handling**
+
+## Quick Start
+
+### Prerequisites
+- Python 3.7+
+- API key from either Anthropic or OpenAI
+- Read access to your development directories
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd Blue
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Configuration
+
+Blue supports both **Anthropic Claude** and **OpenAI GPT** models through TOML configuration files:
+
+#### Option 1: Environment Variables (Quick Setup)
+```bash
+# For Anthropic Claude
+export ANTHROPIC_API_KEY="your_anthropic_key_here"
+
+# For OpenAI GPT  
+export OPENAI_API_KEY="your_openai_key_here"
+```
+
+#### Option 2: TOML Configuration (Recommended)
+Edit the configuration files to customize behavior:
+
+**anthropic_config.toml:**
+```toml
+[anthropic]
+api_key = "your_anthropic_key_here"
+model = "claude-3-5-sonnet-20241022"
+max_tokens = 200
+temperature = 0.7
+```
+
+**openai_config.toml:**
+```toml
+[openai]  
+api_key = "your_openai_key_here"
+model = "gpt-4o"
+max_tokens = 200
+temperature = 0.7
+base_url = "https://api.openai.com/v1"  # Optional: for custom endpoints
+```
+
+### Usage
+
+**Basic Usage:**
+```bash
+# Default: Anthropic Claude
 python blue.py --dir /path/to/your/codebase
+
+# Specify OpenAI GPT
+python blue.py --dir /path/to/your/codebase --provider openai
 ```
 
-### Example Usage
+**Real-world Examples:**
+```bash
+# Monitor a React/TypeScript project
+python blue.py --dir ~/projects/my-react-app --provider anthropic
+
+# Monitor a Python microservice
+python blue.py --dir ~/backend/user-service --provider openai
+
+# Monitor current directory with Claude
+python blue.py --dir . 
+```
+
+## The Ambient Experience in Action
+
+### Continuous Code Intelligence
+
+Blue operates through **three complementary modes** that work simultaneously:
+
+#### 1. **Passive Observation**
+- **Semantic file monitoring** across 15+ programming languages
+- **Change pattern recognition** (architectural shifts, refactoring, new features)
+- **Context accumulation** building understanding over time
+- **Non-intrusive background processing**
+
+**Supported Languages:**
+```
+Python • JavaScript/TypeScript • Java • C/C++ • Go • Rust 
+C# • PHP • Ruby • Swift • Kotlin • Scala • HTML/CSS • SQL
+```
+
+#### 2. **Proactive Insights**
+When Blue detects significant patterns, it proactively shares observations:
+
+- **Architectural implications** of your changes
+- **Potential security or performance concerns**
+- **Code quality suggestions** based on emerging patterns
+- **Refactoring opportunities** as complexity grows
+- **Best practice reminders** contextual to your current work
+
+#### 3. **Interactive Dialogue**
+Natural conversation during development:
 
 ```bash
-# Monitor a Python project
-python blue.py --dir ~/my-python-project
+> I'm trying to decide between using a factory pattern or dependency injection here
 
-# Monitor a JavaScript project  
-python blue.py --dir ~/my-react-app
+🤖 Given the auth refactoring I've been observing, dependency injection would give you 
+better testability. I noticed you're already injecting the database layer in user_service.py - 
+keeping that pattern consistent would make the codebase more maintainable.
 
-# Monitor the current directory
-python blue.py --dir .
+> Good point. What about performance implications?
+
+🤖 For your current scale, the overhead is negligible. The bigger win is the decoupling 
+you'll get, especially since I see you're planning to extract that payment logic into 
+a separate service based on your recent file structure changes.
 ```
 
-## How It Works
+## Sample Session: Building a Authentication System
 
-### 1. File Monitoring
-Blue CLI automatically monitors these file types:
-- Python (`.py`)
-- JavaScript/TypeScript (`.js`, `.ts`, `.jsx`, `.tsx`)
-- Java (`.java`)
-- C/C++ (`.c`, `.cpp`, `.h`)
-- Go (`.go`)
-- Rust (`.rs`)
-- And more...
+```bash
+$ python blue.py --dir ~/my-microservice --provider anthropic
 
-### 2. Change Detection
-The system detects and displays:
-- File modifications, creations, and deletions
-- Line count changes
-- New function additions
-- Meaningful code patterns
+[09:15:22] Blue - Ambient Intelligence for Developers
+[09:15:22] 🔍 Observer Agent initialized
+[09:15:22] 🧠 Navigator Agent initialized with ANTHROPIC  
+[09:15:22] 📁 Monitoring: ~/my-microservice
+[09:15:22] ✨ Blue CLI is now active. Type your thoughts or questions:
 
-### 3. AI Feedback
-When significant changes are detected, the AI assistant provides:
-- Architecture suggestions
-- Code quality observations
-- Security considerations
-- Performance tips
-- General programming advice
+# You start working on authentication...
 
-### 4. Interactive Mode
-While monitoring, you can:
-- Type questions or comments at the `>` prompt
-- Get conversational responses from the AI
-- Discuss your code changes in real-time
-- Type `quit` or `exit` to stop monitoring
+[09:18:45] 📝 auth/models.py created: +67 lines, new functions: User, hash_password, verify_password
+[09:18:48] 🤖 Nice start on the User model! I see you're using proper password hashing - that's 
+critical for security. Consider adding password complexity validation and rate limiting for login attempts.
 
-## Sample Output
+[09:22:15] 📝 auth/jwt_utils.py created: +34 lines, new functions: generate_token, verify_token  
+[09:22:18] 🤖 JWT implementation looks solid. I notice you're using HS256 - for production, 
+consider RS256 for better key rotation. Also, you might want configurable token expiration.
 
-```
-[14:30:15] Blue CLI initialized for directory: /Users/dev/my-project
-[14:30:15] Observer Agent initialized
-[14:30:15] Navigator Agent initialized
-[14:30:15] Starting file monitoring...
-[14:30:15] File monitoring started for: /Users/dev/my-project
+> I'm debating between Redis and database sessions for token storage. What do you think?
 
-[14:32:41] ~ File auth.py modified: +12 lines, new functions: validate_user
-[14:32:45] 🤖 Hey, nice addition of that validate_user function! You might want to consider adding some input validation and error handling for edge cases.
+[09:23:01] 🤖 Based on your current architecture, I'd lean toward Redis. You're building 
+what looks like a stateless microservice, and Redis gives you built-in expiration and 
+better performance for session lookups. Plus it scales horizontally more easily.
 
-> I was thinking about that too. What specific validations would you suggest?
+[09:28:33] 📝 auth/middleware.py modified: +23 lines, new functions: authenticate_request
+[09:28:36] 🤖 Smart middleware pattern! This'll work well with your Flask setup. One thing - 
+consider extracting the token parsing logic into a separate utility so you can reuse it 
+in other services if you're going microservices.
 
-[14:33:02] 🤖 For user validation, I'd suggest checking for empty inputs, validating email formats if applicable, and implementing rate limiting to prevent brute force attempts. Also consider logging failed attempts for security monitoring.
+> Actually, I'm planning to extract this whole auth module into a shared library
 
-[14:35:12] + File user_model.py created: +45 lines, new functions: User, save, load
-[14:35:15] 🤖 I see you're building out the User model - that's a solid separation of concerns! The save/load methods look like they'll work well with your validation layer.
+[09:29:12] 🤖 Perfect timing! That'll make your auth consistent across services. When you 
+extract it, consider making the JWT configuration injectable so different services can 
+have different token lifetimes if needed.
+
+[09:35:47] 📝 tests/test_auth.py created: +89 lines, new functions: test_password_hashing, test_jwt_flow
+[09:35:50] 🤖 Excellent - testing first! I see you're covering the happy path and edge cases. 
+You might also want to test token expiration and invalid signature scenarios.
 
 > quit
-[14:36:05] Blue CLI stopped.
+[09:40:15] 🔴 Blue CLI stopped. Happy coding!
 ```
 
-## File Structure
+## Project Architecture
 
 ```
-Blue_2/
-├── blue.py              # Main CLI entry point
-├── blue_cli.py          # Core system coordinator
-├── observer_agent.py    # File monitoring and change detection
-├── navigator_agent.py   # AI reasoning and conversation
-├── requirements.txt     # Python dependencies
-├── .env.example        # Environment variables template
-└── README.md           # This file
+Blue/
+├── 🚀 Core System
+│   ├── blue.py                 # CLI entry point & argument parsing
+│   ├── blue_cli.py             # Multi-agent coordinator & session management  
+│   ├── observer_agent.py       # Filesystem monitoring & change detection
+│   └── navigator_agent.py      # LLM integration & conversation management
+│
+├── ⚙️  Configuration  
+│   ├── anthropic_config.toml   # Claude model settings & prompts
+│   ├── openai_config.toml      # GPT model settings & prompts
+│   └── requirements.txt        # Python dependencies
+│
+├── 📁 Generated (Runtime)
+│   ├── .blue_session/          # Session state & conversation history
+│   └── .blue_cache/            # File change cache & patterns
+│
+└── 📖 Documentation
+    └── README.md               # This file
 ```
 
-## Configuration
+## Advanced Configuration
 
-### Environment Variables
-- `ANTHROPIC_API_KEY`: Your Anthropic API key (required for AI features)
+### Custom System Prompts
 
-### Supported File Types
-The system monitors common programming file extensions. You can modify the `supported_extensions` set in `observer_agent.py` to add or remove file types.
+Modify the TOML configuration files to customize Blue's personality and expertise:
 
-### Change Detection Thresholds
-- Buffer size: 10 recent changes (configurable in `observer_agent.py`)
-- Processing trigger: 5 accumulated changes or function detection
-- Response length: Up to 200 tokens for concise feedback
+```toml
+[anthropic.system_prompts]
+proactive = """You are an expert software architect observing code changes...
+Focus on: security, performance, maintainability, and emerging patterns."""
 
-## Troubleshooting
+interactive = """You are a senior developer mentor having a real-time conversation...
+Be encouraging, specific, and help with architectural decisions."""
+```
+
+### Performance Tuning
+
+```toml
+[anthropic.limits]
+max_conversation_history = 10      # Conversation context window
+max_recent_changes = 8             # File changes to analyze
+```
+
+### Provider-Specific Settings
+
+**Anthropic Claude:**
+```toml
+[anthropic]
+model = "claude-3-5-sonnet-20241022"    # Latest Claude model
+max_tokens = 300                        # Longer responses
+temperature = 0.6                       # More focused outputs
+```
+
+**OpenAI GPT:**
+```toml
+[openai]
+model = "gpt-4o"                        # GPT-4 Optimized
+base_url = "https://api.openai.com/v1"  # Custom endpoint support
+```
+
+## Troubleshooting & Optimization
 
 ### Common Issues
 
-1. **"ANTHROPIC_API_KEY not found"**
-   - Make sure you've created a `.env` file with your API key
-   - Verify the API key is valid
+#### **API Configuration**
+```bash
+# Issue: "API key not found"
+# Solution: Check both config file and environment variables
 
-2. **No file changes detected**
-   - Check that you're editing files with supported extensions
-   - Verify the directory path is correct
-   - Hidden files and common build directories are ignored
+# Verify configuration
+cat anthropic_config.toml  # Check if api_key is set
+echo $ANTHROPIC_API_KEY    # Check environment variable
 
-3. **Permission errors**
-   - Ensure you have read access to the directory you're monitoring
-   - Some system directories may require special permissions
-
-### Performance Tips
-
-- For large codebases, consider monitoring specific subdirectories
-- The system automatically ignores build directories (`node_modules`, `__pycache__`, etc.)
-- File content is cached efficiently to detect meaningful changes
-
-## Extending Blue CLI
-
-### Adding New File Types
-Edit the `supported_extensions` set in `observer_agent.py`:
-```python
-self.supported_extensions.add('.your_extension')
+# Test API connectivity
+python -c "import anthropic; print(anthropic.Anthropic(api_key='your_key').models.list())"
 ```
 
-### Customizing AI Behavior
-Modify the system prompts in `navigator_agent.py` to change how the AI responds to different situations.
+#### **File Monitoring**
+```bash
+# Issue: Changes not detected
+# Solution: Verify file types and permissions
 
-### Adding New Agents
-The architecture supports additional agents - simply create new agent classes and integrate them into the `blue_cli.py` coordinator.
+# Check supported extensions (in observer_agent.py)
+grep -n "supported_extensions" observer_agent.py
 
-## Requirements
+# Verify directory permissions  
+ls -la /path/to/your/codebase
+```
 
-- Python 3.7+
-- Anthropic API key
-- Internet connection for AI features
-- Read access to the directories you want to monitor
+#### **Performance Issues**
+```bash  
+# Issue: High CPU usage on large repositories
+# Solution: Optimize monitoring scope
 
-## License
+# Monitor specific subdirectories
+python blue.py --dir ./src --provider anthropic
 
-This project is for educational and development purposes. Please respect API usage guidelines and rate limits.
+# Exclude large directories by modifying observer_agent.py ignore patterns
+```
+
+### Production Deployment
+
+For teams wanting to deploy Blue as a shared development tool:
+
+#### **Docker Container**
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+ENTRYPOINT ["python", "blue.py"]
+```
+
+#### **Team Configuration**
+```toml
+# shared_config.toml
+[anthropic]
+model = "claude-3-5-sonnet-20241022"
+max_tokens = 150                    # Shorter for team usage
+temperature = 0.5                   # More consistent responses
+
+[anthropic.system_prompts]
+proactive = """You are a team code reviewer focused on:
+- Security vulnerabilities
+- Performance bottlenecks  
+- Code style consistency
+- Architecture decisions that affect team velocity"""
+```
+
+## Extending Blue
+
+### Custom Agents
+
+The multi-agent architecture supports domain-specific agents:
+
+```python
+class SecurityAgent:
+    def analyze_change(self, file_content, change_type):
+        # Custom security analysis logic
+        if self.detect_sql_injection_risk(file_content):
+            return "⚠️  Potential SQL injection risk detected"
+        return None
+
+# Register in blue_cli.py
+self.security_agent = SecurityAgent()
+```
+
+### Integration Hooks
+
+Blue can integrate with existing development workflows:
+
+```python
+# Git hooks integration
+def on_commit_hook(commit_info):
+    blue_session = BlueCLI(".", provider="anthropic")
+    analysis = blue_session.analyze_commit(commit_info)
+    return analysis
+
+# CI/CD pipeline integration  
+def ci_code_review(changed_files):
+    return BlueCLI.batch_analyze(changed_files, provider="openai")
+```
+
+### Plugin Architecture
+
+```python
+# Custom plugin example: performance_monitor.py
+class PerformanceMonitorPlugin:
+    def on_file_change(self, file_path, change_details):
+        if self.is_performance_critical(file_path):
+            return self.analyze_performance_impact(change_details)
+```
+
+## The Future of Ambient Development
+
+Blue represents the first step toward **truly ambient development environments** where:
+
+- **AI understands your codebase** as deeply as you do
+- **Insights emerge naturally** from your development patterns  
+- **Knowledge compounds** across sessions and team members
+- **Development flow** remains uninterrupted by AI assistance
+
+As models improve and context windows expand, ambient agents will become indispensable partners in software creation, helping developers navigate complexity while maintaining creative control.
+
+---
+
+## Technical Specifications
+
+**Supported Models:**
+- Anthropic: Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku
+- OpenAI: GPT-4o, GPT-4 Turbo, GPT-3.5 Turbo
+
+**System Requirements:**
+- Python 3.7+ (3.9+ recommended)
+- 50MB disk space
+- Network access for LLM APIs
+- Read permissions on target directories
+
+**Performance:**
+- ~1-5ms file change detection latency
+- ~200-500ms LLM response time (model dependent)
+- <10MB memory footprint for typical sessions
+
+**Security:**
+- API keys encrypted in transit (HTTPS)
+- No code content stored remotely
+- Local session data only
+
+---
+
+*Built with ❤️ for developers who believe AI should enhance, not interrupt, the creative process of coding.*

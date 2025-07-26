@@ -14,13 +14,13 @@ from navigator_agent import NavigatorAgent
 
 
 class BlueCLI:
-    def __init__(self, directory_path: str):
+    def __init__(self, directory_path: str, llm_provider: str = "anthropic"):
         self.directory_path = directory_path
         self.running = False
         
         # Initialize agents
         self.observer = ObserverAgent(directory_path)
-        self.navigator = NavigatorAgent()
+        self.navigator = NavigatorAgent(llm_provider)
         
         # Set up communication between agents
         self.observer.set_navigator(self.navigator)

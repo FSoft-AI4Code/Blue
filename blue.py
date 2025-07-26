@@ -22,6 +22,14 @@ def main():
         help="Path to the codebase directory to monitor"
     )
     
+    parser.add_argument(
+        "--provider",
+        type=str,
+        choices=["anthropic", "openai"],
+        default="anthropic",
+        help="LLM provider to use (default: anthropic)"
+    )
+    
     args = parser.parse_args()
     
     # Validate directory path
@@ -36,7 +44,7 @@ def main():
     # Initialize and start the Blue CLI system
     from blue_cli import BlueCLI
     
-    cli = BlueCLI(args.dir)
+    cli = BlueCLI(args.dir, args.provider)
     cli.start()
 
 if __name__ == "__main__":
