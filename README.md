@@ -2,7 +2,7 @@
 
 > *"The best pair programmer is one who's always there, never intrusive, and speaks up exactly when you need them to."*
 
-## Philosophy: Rethinking Developer-AI Interaction
+## Rethinking Developer-AI Interaction
 
 Traditional AI coding assistants operate on a **request-response paradigm** - you ask, they answer. Blue represents a fundamental shift toward **ambient intelligence** - an AI system that understands your development context continuously and provides insights proactively, like an experienced colleague working alongside you.
 
@@ -327,6 +327,7 @@ ls -la /path/to/your/codebase
 # Monitor specific subdirectories
 python blue.py --dir ./src --provider anthropic
 
+<<<<<<< HEAD
 # Exclude large directories by modifying observer_agent.py ignore patterns
 ```
 
@@ -442,3 +443,6 @@ As models improve and context windows expand, ambient agents will become indispe
 ---
 
 *Built with ❤️ for developers who believe AI should enhance, not interrupt, the creative process of coding.*
+=======
+This project is for educational and development purposes. Please respect API usage guidelines and rate limits.
+>>>>>>> 5e40b60d0fba67e73a2fa5d53258620aee5e0e28
