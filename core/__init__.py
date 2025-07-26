@@ -1,1 +1,0 @@
-# Blue CLI Core Package

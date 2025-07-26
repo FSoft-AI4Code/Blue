@@ -1,299 +1,180 @@
-# Blue CLI 🔵
+# Blue CLI - Ambient Pair Programming Assistant
 
-A command-line-only Jarvis-like workspace-wise pair programming assistant, implemented using AutoGen for multi-agent orchestration with transparent decision-making processes to ensure reliable and traceable operations.
-
-Blue CLI runs as a terminal-based tool that observes your developer workspace ecosystem, including local codebase changes and remote contexts like Google Docs/Drive, Jira tickets, GitHub Issues/PRs, and more. It provides strategic, big-picture guidance through a lightweight, in-memory workspace context graph that connects all your development contexts.
+Blue CLI is a Jarvis-like command-line application that acts as an ambient pair programming assistant. It monitors your codebase in real-time and provides proactive, conversational feedback about your code changes.
 
 ## Features
 
-### 🧠 Strategic Navigation
-- **Big-picture scope management** as a navigator, not a micromanager
-- **Architecture alignment** and scalability implications
-- **Maintainability insights** across your workspace graph
-- **Goal coherence** tracking and blind spot identification
-- **Empathetic, collaborative suggestions** that foster thoughtful development
-
-### 🔄 Event-Driven Intelligence
-- **Real-time file monitoring** using watchdog for .py/.js/etc. files
-- **Dynamic decision algorithm** with human-like intervention timing
-- **Context-aware scoring** based on change patterns and goal relevance
-- **Adaptive thresholds** that learn from your feedback
-- **Batch processing** to avoid notification fatigue
-
-### 🌐 Workspace Integration
-- **Multi-source context graph** connecting code, tickets, docs, and goals
-- **Auto-parsing references** like "#JIRA-123" from code comments
-- **Manual linking** of external resources
-- **Intelligent traversals** for insights and blind spot detection
-- **Persistent state** with JSON-based session management
-
-### 🤖 Multi-Agent Architecture
-- **Navigator Agent**: Strategic guidance and goal management (GPT-4 or Claude 3.5 Sonnet powered)
-- **Observer Agent**: Event monitoring and remote context fetching
-- **Tool Agents**: API calls, code analysis, and Git operations
-- **Transparent dialogues** in verbose mode for debugging
-
-### 🔧 AI Provider Support
-- **OpenAI Integration**: GPT-4 for strategic thinking and goal decomposition
-- **Anthropic Integration**: Claude 3.5 Sonnet for strategic analysis and insights
-- **Runtime switching**: Change AI providers on-the-fly with `/ai-provider` command
-- **Unified interface**: Same functionality regardless of provider choice
+- **Real-time File Monitoring**: Watches your codebase for changes using efficient event-driven monitoring
+- **Intelligent Change Detection**: Recognizes meaningful code changes like new functions, significant line additions, etc.
+- **AI-Powered Insights**: Uses Claude 3.5 Sonnet to provide architectural suggestions and code quality feedback
+- **Conversational Interface**: Natural, bidirectional communication that feels like pair programming
+- **Color-Coded Output**: Easy-to-read terminal output with timestamps and color coding
+- **Multi-Agent Architecture**: Observer Agent for monitoring, Navigator Agent for reasoning
 
 ## Installation
 
-### Prerequisites
-- Python 3.10 or higher
-- Git repository (for optimal functionality)
-- OpenAI API key OR Anthropic API key for Navigator agent
+1. **Clone or download** the Blue CLI files to your local machine.
 
-### Setup
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-1. **Clone and install dependencies:**
+3. **Set up your API key**:
+   - Copy `.env.example` to `.env`
+   - Add your Anthropic API key:
+     ```
+     ANTHROPIC_API_KEY=your_actual_api_key_here
+     ```
+
+## Usage
+
+Run Blue CLI by pointing it to a directory you want to monitor:
+
 ```bash
-git clone <repository-url>
-cd Blue
-pip install -r requirements.txt
+python blue.py --dir /path/to/your/codebase
 ```
 
-2. **Set up your AI API key (choose one):**
+### Example Usage
 
-For OpenAI (GPT-4):
 ```bash
-export OPENAI_API_KEY="your-openai-api-key-here"
-```
+# Monitor a Python project
+python blue.py --dir ~/my-python-project
 
-For Anthropic (Claude):
-```bash
-export ANTHROPIC_API_KEY="your-anthropic-api-key-here"
-```
+# Monitor a JavaScript project  
+python blue.py --dir ~/my-react-app
 
-3. **Run Blue CLI:**
-```bash
-python main.py --dir /path/to/your/codebase
-```
-
-## Quick Start
-
-### Basic Usage
-```bash
-# Start Blue CLI in your project directory
-python main.py --dir /path/to/your/project
-
-# Set a goal to begin
-> /set-goal "implement user authentication system"
-
-# Link external resources
-> /link jira https://yourcompany.atlassian.net/browse/AUTH-123
-
-# Ask for strategic guidance
-> /ask "what are potential architectural concerns?"
-
-# Switch AI provider (if you have both API keys)
-> /ai-provider anthropic
-
-# Check status and configuration
-> /status
-> /config
-```
-
-### Command Reference
-
-| Command | Description | Example |
-|---------|-------------|---------|
-| `/set-goal "goal"` | Set your current programming goal | `/set-goal "implement login function"` |
-| `/link <type> <url>` | Link external resource | `/link jira https://company.atlassian.net/issue/KEY-123` |
-| `/ask "question"` | Ask Navigator a question | `/ask "explain blind spot"` |
-| `/status` | Show current status and progress | `/status` |
-| `/quiet` | Toggle quiet mode (fewer interventions) | `/quiet` |
-| `/verbose on/off` | Toggle verbose mode (show agent dialogues) | `/verbose on` |
-| `/rate +/-` | Rate last suggestion for learning | `/rate +` |
-| `/ai-provider <provider>` | Switch AI provider | `/ai-provider anthropic` |
-| `/config` | Show configuration status | `/config` |
-| `/help` | Show help message | `/help` |
-| `/exit` | Exit Blue CLI | `/exit` |
-
-## Configuration
-
-Blue CLI uses a TOML configuration file located at `~/.config/blue-cli/config.toml` (or `~/blue-cli/config.toml` on Windows).
-
-### Example Configuration
-```toml
-[api_keys]
-openai = "your-openai-key"
-anthropic = "your-anthropic-key"
-jira = "your-jira-token"
-github = "your-github-token"
-
-[preferences]
-verbose_mode = false
-quiet_mode = false
-intervention_threshold = 8
-confidence_threshold = 70.0
-buffer_size = 10
-ai_provider = "anthropic"  # or "openai" (default: anthropic)
-
-[integrations.jira]
-enabled = true
-base_url = "https://company.atlassian.net"
-username = "your-email@company.com"
-
-[integrations.github]
-enabled = true
-username = "your-github-username"
-repositories = ["owner/repo1", "owner/repo2"]
-
-[integrations.google_drive]
-enabled = false
-folder_ids = []
-
-[security]
-encrypt_sensitive_data = true
-require_confirmation_for_api_calls = true
-```
-
-### Setting up Integrations
-
-#### Jira Integration
-```bash
-# The CLI will prompt you for configuration
-> /setup jira
-```
-
-#### GitHub Integration
-```bash
-# Generate a personal access token at github.com/settings/tokens
-> /setup github
-```
-
-#### Google Drive Integration
-```bash
-# Follow Google Drive API setup instructions
-> /setup gdrive
+# Monitor the current directory
+python blue.py --dir .
 ```
 
 ## How It Works
 
-### Decision Algorithm
-Blue CLI uses a sophisticated decision algorithm that mimics human navigation behavior:
+### 1. File Monitoring
+Blue CLI automatically monitors these file types:
+- Python (`.py`)
+- JavaScript/TypeScript (`.js`, `.ts`, `.jsx`, `.tsx`)
+- Java (`.java`)
+- C/C++ (`.c`, `.cpp`, `.h`)
+- Go (`.go`)
+- Rust (`.rs`)
+- And more...
 
-1. **Event Accumulation**: Changes are buffered in a rolling window
-2. **Pattern Scoring**: Events are scored based on structural changes, complexity, and goal relevance
-3. **Threshold Evaluation**: Cumulative scores are compared against adaptive thresholds
-4. **Contextual Analysis**: Graph state and external factors boost confidence
-5. **Strategic Intervention**: Only intervenes when confidence exceeds threshold
+### 2. Change Detection
+The system detects and displays:
+- File modifications, creations, and deletions
+- Line count changes
+- New function additions
+- Meaningful code patterns
 
-### Workspace Graph
-The in-memory graph connects:
-- **Files** and their dependencies
-- **Goals** and subtasks
-- **External resources** (Jira, GitHub, Drive)
-- **References** auto-parsed from code
-- **Patterns** and architectural concerns
+### 3. AI Feedback
+When significant changes are detected, the AI assistant provides:
+- Architecture suggestions
+- Code quality observations
+- Security considerations
+- Performance tips
+- General programming advice
 
-### Example Intervention
-```
-[15:32] Navigator: On your login goal: Observing emerging structure—graph flags 
-tight coupling risking scalability per Confluence guidelines. Big pic: Decouple 
-with interfaces? Preview idea: Abstract auth service. Your thoughts? [Y/N/Explain]
-```
+### 4. Interactive Mode
+While monitoring, you can:
+- Type questions or comments at the `>` prompt
+- Get conversational responses from the AI
+- Discuss your code changes in real-time
+- Type `quit` or `exit` to stop monitoring
 
-## Advanced Usage
-
-### Verbose Mode
-See internal agent dialogues and decision traces:
-```bash
-> /verbose on
-```
-
-### Quiet Mode
-Reduce intervention frequency for focused work:
-```bash
-> /quiet
-```
-
-### Health Check
-Monitor system health and diagnostics:
-```bash
-> /health
-```
-
-### Feedback Learning
-Rate suggestions to improve the algorithm:
-```bash
-> /rate +    # Positive feedback
-> /rate -    # Negative feedback
-```
-
-## Architecture
+## Sample Output
 
 ```
-Blue CLI
-├── main.py                 # Entry point and CLI orchestration
-├── agents/
-│   ├── navigator.py        # Strategic guidance (GPT-4)
-│   ├── observer.py         # Event monitoring
-│   └── tool_agents.py      # API calls, code analysis
-├── core/
-│   ├── workspace_graph.py  # Context graph management
-│   └── decision_algorithm.py # Intervention logic
-└── utils/
-    ├── config_manager.py   # Configuration handling
-    └── error_handler.py    # Error handling & fallbacks
+[14:30:15] Blue CLI initialized for directory: /Users/dev/my-project
+[14:30:15] Observer Agent initialized
+[14:30:15] Navigator Agent initialized
+[14:30:15] Starting file monitoring...
+[14:30:15] File monitoring started for: /Users/dev/my-project
+
+[14:32:41] ~ File auth.py modified: +12 lines, new functions: validate_user
+[14:32:45] 🤖 Hey, nice addition of that validate_user function! You might want to consider adding some input validation and error handling for edge cases.
+
+> I was thinking about that too. What specific validations would you suggest?
+
+[14:33:02] 🤖 For user validation, I'd suggest checking for empty inputs, validating email formats if applicable, and implementing rate limiting to prevent brute force attempts. Also consider logging failed attempts for security monitoring.
+
+[14:35:12] + File user_model.py created: +45 lines, new functions: User, save, load
+[14:35:15] 🤖 I see you're building out the User model - that's a solid separation of concerns! The save/load methods look like they'll work well with your validation layer.
+
+> quit
+[14:36:05] Blue CLI stopped.
 ```
 
-## Contributing
+## File Structure
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+```
+Blue_2/
+├── blue.py              # Main CLI entry point
+├── blue_cli.py          # Core system coordinator
+├── observer_agent.py    # File monitoring and change detection
+├── navigator_agent.py   # AI reasoning and conversation
+├── requirements.txt     # Python dependencies
+├── .env.example        # Environment variables template
+└── README.md           # This file
+```
 
-## Privacy & Security
+## Configuration
 
-- **Local-first**: Graph data stored locally in JSON format
-- **Encrypted secrets**: API keys encrypted in configuration
-- **Consent-based**: Prompts for permissions on first use
-- **No telemetry**: No data sent to external services except configured integrations
+### Environment Variables
+- `ANTHROPIC_API_KEY`: Your Anthropic API key (required for AI features)
+
+### Supported File Types
+The system monitors common programming file extensions. You can modify the `supported_extensions` set in `observer_agent.py` to add or remove file types.
+
+### Change Detection Thresholds
+- Buffer size: 10 recent changes (configurable in `observer_agent.py`)
+- Processing trigger: 5 accumulated changes or function detection
+- Response length: Up to 200 tokens for concise feedback
 
 ## Troubleshooting
 
 ### Common Issues
 
-**High memory usage:**
-- Reduce `buffer_size` in configuration
-- Use `/quiet` mode during intensive work
+1. **"ANTHROPIC_API_KEY not found"**
+   - Make sure you've created a `.env` file with your API key
+   - Verify the API key is valid
 
-**Network connectivity issues:**
-- Blue CLI automatically enters fallback mode
-- Works offline with local graph data
-- Check `/status` for connectivity status
+2. **No file changes detected**
+   - Check that you're editing files with supported extensions
+   - Verify the directory path is correct
+   - Hidden files and common build directories are ignored
 
-**Too many/few interventions:**
-- Adjust `intervention_threshold` in config
-- Use `/rate +/-` to provide feedback
-- Toggle `/quiet` mode as needed
+3. **Permission errors**
+   - Ensure you have read access to the directory you're monitoring
+   - Some system directories may require special permissions
 
-### Debug Mode
-```bash
-python main.py --dir /path/to/project --verbose
+### Performance Tips
+
+- For large codebases, consider monitoring specific subdirectories
+- The system automatically ignores build directories (`node_modules`, `__pycache__`, etc.)
+- File content is cached efficiently to detect meaningful changes
+
+## Extending Blue CLI
+
+### Adding New File Types
+Edit the `supported_extensions` set in `observer_agent.py`:
+```python
+self.supported_extensions.add('.your_extension')
 ```
 
-### Health Check
-```bash
-> /health
-```
+### Customizing AI Behavior
+Modify the system prompts in `navigator_agent.py` to change how the AI responds to different situations.
+
+### Adding New Agents
+The architecture supports additional agents - simply create new agent classes and integrate them into the `blue_cli.py` coordinator.
+
+## Requirements
+
+- Python 3.7+
+- Anthropic API key
+- Internet connection for AI features
+- Read access to the directories you want to monitor
 
 ## License
 
-MIT License - see LICENSE file for details.
-
-## Acknowledgments
-
-- Built with [AutoGen](https://github.com/microsoft/autogen) for multi-agent orchestration
-- Uses [Watchdog](https://github.com/gorakhargosh/watchdog) for file monitoring
-- Strategic guidance powered by OpenAI GPT-4
-
----
-
-**Blue CLI** - Your strategic pair programming navigator 🔵
+This project is for educational and development purposes. Please respect API usage guidelines and rate limits.
