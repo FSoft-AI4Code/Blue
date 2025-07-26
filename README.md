@@ -6,7 +6,6 @@ Blue CLI is a Jarvis-like command-line application that acts as an ambient pair 
 
 - **Real-time File Monitoring**: Watches your codebase for changes using efficient event-driven monitoring
 - **Intelligent Change Detection**: Recognizes meaningful code changes like new functions, significant line additions, etc.
-- **AI-Powered Insights**: Uses Claude 3.5 Sonnet to provide architectural suggestions and code quality feedback
 - **Conversational Interface**: Natural, bidirectional communication that feels like pair programming
 - **Color-Coded Output**: Easy-to-read terminal output with timestamps and color coding
 - **Multi-Agent Architecture**: Observer Agent for monitoring, Navigator Agent for reasoning
