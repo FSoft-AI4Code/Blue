@@ -1,0 +1,11 @@
+  # Test function development scenario
+  python test_file_changes.py --scenario function_development
+
+  # Test with faster changes (1 second delay)
+  python test_file_changes.py --scenario mixed_development --delay 1.0
+
+  # Run all scenarios sequentially
+  python test_file_changes.py --scenario all
+
+  # Keep test files for inspection
+  python test_file_changes.py --scenario architectural --no-cleanup

@@ -49,18 +49,43 @@ class ObserverAgent:
         self.observer = None
         self.running = False
         
+        # Load configuration
+        self.config = self._load_config()
+        
         # Change buffer (keeps last 10 events)
         self.change_buffer = deque(maxlen=10)
-        self.buffer_threshold = 5
+        limits = self.config.get('limits', {})
+        self.buffer_threshold = limits.get('buffer_threshold', 4)
+        self.min_buffer_size = limits.get('min_buffer_size', 3)
+        self.last_processing_time = 0
+        self.processing_cooldown = limits.get('processing_cooldown', 30)
         
         # Track recent file contents to detect meaningful changes
         self.file_contents_cache = {}
         
-        # Supported file extensions
-        self.supported_extensions = {'.py', '.js', '.ts', '.jsx', '.tsx', '.java', '.cpp', '.c', '.h', '.go', 
-                                   '.rs', '.php', '.rb', '.swift', '.kt', '.cs', '.vue', '.html', '.css', '.scss'}
+        # Supported file extensions from config
+        monitoring = self.config.get('monitoring', {})
+        self.supported_extensions = set(monitoring.get('supported_extensions', 
+            ['.py', '.js', '.ts', '.jsx', '.tsx', '.java', '.cpp', '.c', '.h', '.go', 
+             '.rs', '.php', '.rb', '.swift', '.kt', '.cs', '.vue', '.html', '.css', '.scss']))
+        self.ignore_directories = set(monitoring.get('ignore_directories', 
+            ['node_modules', '__pycache__', '.git', 'build', 'dist', 'target', '.pytest_cache']))
+        self.ignore_files = set(monitoring.get('ignore_files', ['.DS_Store', '*.log', '*.tmp', '*.cache']))
         
         print(colored(f"[{self._timestamp()}] Observer Agent initialized", "yellow"))
+    
+    def _load_config(self) -> Dict[str, Any]:
+        """Load configuration from unified config.toml file"""
+        try:
+            import toml
+            with open('config.toml', 'r') as f:
+                return toml.load(f)
+        except FileNotFoundError:
+            print(colored("Warning: config.toml not found. Using default settings.", "yellow"))
+            return {}
+        except Exception as e:
+            print(colored(f"Error loading config.toml: {e}", "red"))
+            return {}
     
     def set_navigator(self, navigator):
         """Set reference to navigator agent"""
@@ -77,9 +102,8 @@ class ObserverAgent:
         if any(part.startswith('.') for part in path.parts):
             return False
             
-        # Skip common build/cache directories
-        skip_dirs = {'node_modules', '__pycache__', '.git', 'build', 'dist', 'target', '.pytest_cache'}
-        if any(skip_dir in path.parts for skip_dir in skip_dirs):
+        # Skip ignored directories from config
+        if any(skip_dir in path.parts for skip_dir in self.ignore_directories):
             return False
             
         # Check file extension
@@ -193,27 +217,115 @@ class ObserverAgent:
         print(colored(message, color))
     
     def _should_trigger_processing(self) -> bool:
-        """Determine if we should trigger navigator processing"""
-        # Trigger if buffer reaches threshold
-        if len(self.change_buffer) >= self.buffer_threshold:
+        """Enhanced decision logic for when to trigger navigator processing"""
+        current_time = time.time()
+        buffer_size = len(self.change_buffer)
+        
+        # Don't process if we don't have minimum events
+        if buffer_size < self.min_buffer_size:
+            return False
+            
+        # Respect cooldown period
+        if current_time - self.last_processing_time < self.processing_cooldown:
+            return False
+        
+        # Trigger conditions (in order of priority):
+        
+        # 1. Function completion detected (high priority)
+        if self._has_function_completion():
             return True
             
-        # Trigger if we detect function completion
-        recent_events = list(self.change_buffer)[-3:]  # Last 3 events
+        # 2. Significant architectural change (file creation + modification)
+        if self._has_architectural_change():
+            return True
+            
+        # 3. Buffer reaches threshold
+        if buffer_size >= self.buffer_threshold:
+            return True
+            
+        # 4. Sustained activity (multiple files over time)
+        if self._has_sustained_activity():
+            return True
+            
+        return False
+    
+    def _has_function_completion(self) -> bool:
+        """Check if recent changes suggest function completion"""
+        recent_events = list(self.change_buffer)[-3:]
         for event in recent_events:
             if 'functions_added' in event.details and event.details['functions_added']:
                 return True
-                
+        return False
+    
+    def _has_architectural_change(self) -> bool:
+        """Check for architectural changes (new files, imports, etc.)"""
+        recent_events = list(self.change_buffer)[-4:]
+        
+        # Look for file creation followed by modifications
+        has_creation = any(event.event_type == 'created' for event in recent_events)
+        has_modification = any(event.event_type == 'modified' for event in recent_events)
+        
+        return has_creation and has_modification
+    
+    def _has_sustained_activity(self) -> bool:
+        """Check for sustained activity across multiple files"""
+        if len(self.change_buffer) < 3:
+            return False
+            
+        # Check if we have changes across multiple files
+        unique_files = set(event.file_path for event in self.change_buffer)
+        
+        # Check time span of recent activity  
+        if len(self.change_buffer) >= 2:
+            time_span = (self.change_buffer[-1].timestamp - self.change_buffer[0].timestamp).total_seconds()
+            # If we have 3+ files changed in less than 5 minutes, that's sustained activity
+            return len(unique_files) >= 3 and time_span < 300
+            
         return False
     
     def _trigger_navigator_processing(self):
         """Send accumulated changes to navigator for processing"""
         if self.navigator:
             changes_summary = self._get_changes_summary()
+            
+            # Add decision context for the Navigator
+            changes_summary['processing_reason'] = self._get_processing_reason()
+            changes_summary['priority_level'] = self._assess_priority_level()
+            
             self.navigator.process_changes(changes_summary)
-            # Clear some buffer space but keep recent changes
-            while len(self.change_buffer) > 3:
+            
+            # Update last processing time
+            self.last_processing_time = time.time()
+            
+            # Clear some buffer space but keep recent changes for context
+            while len(self.change_buffer) > 2:
                 self.change_buffer.popleft()
+    
+    def _get_processing_reason(self) -> str:
+        """Determine why we're processing now (for Navigator context)"""
+        if self._has_function_completion():
+            return 'function_completion'
+        elif self._has_architectural_change():
+            return 'architectural_change'
+        elif len(self.change_buffer) >= self.buffer_threshold:
+            return 'buffer_full'
+        elif self._has_sustained_activity():
+            return 'sustained_activity'
+        else:
+            return 'threshold_met'
+    
+    def _assess_priority_level(self) -> str:
+        """Assess priority level of current changes"""
+        # High priority: new functions, file creation, multiple files
+        if self._has_function_completion() or self._has_architectural_change():
+            return 'high'
+        
+        # Medium priority: sustained activity
+        if self._has_sustained_activity():
+            return 'medium'
+            
+        # Low priority: regular modifications
+        return 'low'
     
     def _get_changes_summary(self) -> Dict[str, Any]:
         """Get summary of recent changes for navigator"""
