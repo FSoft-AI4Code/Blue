@@ -1,0 +1,51 @@
+# Blue - Default Configuration
+# This is the fallback configuration used when no user config is found
+
+[models.anthropic]
+model = "claude-3-5-sonnet-20241022"
+max_tokens = 400
+temperature = 0.7
+
+[models.openai]
+model = "gpt-4o"
+max_tokens = 400
+temperature = 0.7
+base_url = "https://api.openai.com/v1"
+
+[system_prompts]
+proactive = "You are Blue, an ambient pair programming assistant. Provide helpful, conversational comments about code changes, focusing on security, performance, and architecture. Be specific and actionable."
+
+interactive = "You are Blue, a friendly coding assistant. Have natural conversations with developers, referencing their recent code changes and providing helpful advice."
+
+code_reviewer = "You are an expert code reviewer focusing on security, performance, and code quality. Provide concise, actionable feedback."
+
+architect = "You are a software architect focusing on system design and scalability. Provide high-level architectural insights."
+
+[limits]
+# Buffer and processing limits
+min_buffer_size = 3
+buffer_threshold = 4
+processing_cooldown = 30
+max_conversation_history = 8
+max_recent_changes = 6
+
+# Scoring system for intelligent decision making
+score_threshold = 5
+idle_threshold = 30
+max_buffer_age = 120
+
+# Dynamic decision making with LLM
+enable_llm_decision = true
+confidence_threshold = 7
+decision_prompt = """Changes: {changes}. Context: {context}. Good time for big-picture input? Answer: YES/NO, confidence 1-10."""
+
+# Adaptive learning from user feedback
+enable_adaptive_learning = true
+threshold_adjustment = 1
+min_score_threshold = 3
+max_score_threshold = 10
+
+[monitoring]
+supported_extensions = [".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".cpp", ".c", ".h", ".go", ".rs", ".php", ".rb", ".swift", ".kt", ".cs", ".vue", ".html", ".css", ".scss", ".sql", ".yaml", ".yml", ".json"]
+ignore_directories = ["node_modules", "__pycache__", ".git", "build", "dist", "target", ".pytest_cache", ".vscode", ".idea", "venv", "env"]
+ignore_files = [".DS_Store", "*.log", "*.tmp", "*.cache"]
