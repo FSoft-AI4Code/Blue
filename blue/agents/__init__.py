@@ -1,10 +1,11 @@
 """
-Blue Agents Package
+Blue Agents Package (Refactored)
 
-Contains the core agent implementations for the Blue ambient assistant.
+Contains only true "agents" - components that use LLM reasoning and have "intelligence".
+Pure mechanical components have been moved to monitoring/ and conversation/ packages.
 """
 
-from .navigator import NavigatorAgent
-from .observer import ObserverAgent
+from .navigator_agent import NavigatorAgent
+from .intervention_agent import InterventionAgent
 
-__all__ = ["NavigatorAgent", "ObserverAgent"]
+__all__ = ["NavigatorAgent", "InterventionAgent"]

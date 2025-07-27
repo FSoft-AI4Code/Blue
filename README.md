@@ -441,8 +441,3 @@ As models improve and context windows expand, ambient agents will become indispe
 - Local session data only
 
 ---
-
-*Built with ❤️ for developers who believe AI should enhance, not interrupt, the creative process of coding.*
-=======
-This project is for educational and development purposes. Please respect API usage guidelines and rate limits.
->>>>>>> 5e40b60d0fba67e73a2fa5d53258620aee5e0e28

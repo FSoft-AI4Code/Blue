@@ -1,11 +1,10 @@
 """
 Blue Core Package
 
-Contains core functionality including LLM clients, decision engines, and scoring systems.
+Contains core LLM client functionality.
 """
 
 from .llm_client import LLMClientFactory
-from .decision_engine import DecisionEngine
-from .scoring import ScoringSystem
+from .llm_config import LLMConfigManager
 
-__all__ = ["LLMClientFactory", "DecisionEngine", "ScoringSystem"]
+__all__ = ["LLMClientFactory", "LLMConfigManager"]

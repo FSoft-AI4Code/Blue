@@ -1,6 +1,30 @@
 # Blue - Default Configuration
-# This is the fallback configuration used when no user config is found
+# This is the single source of truth for default configuration values
+# Users can override these settings in their config/config.toml file
 
+# Global LLM provider configurations - API keys and base settings
+[llm_providers.anthropic]
+# api_key = ""  # Set via environment variable ANTHROPIC_API_KEY or in user config
+base_url = "https://api.anthropic.com"
+
+[llm_providers.openai]
+# api_key = ""  # Set via environment variable OPENAI_API_KEY or in user config
+base_url = "https://api.openai.com/v1"
+
+# Agent-specific LLM configurations - each agent can use different models/providers
+[agents.navigator]
+provider = "anthropic"                 # Main agent uses high-quality model
+model = "claude-3-5-sonnet-20241022"
+max_tokens = 500
+temperature = 0.7
+
+[agents.intervention]
+provider = "anthropic"                 # Decision agent uses faster model
+model = "claude-3-5-haiku-20241022"
+max_tokens = 100
+temperature = 0.3
+
+# Backward compatibility - legacy model configurations
 [models.anthropic]
 model = "claude-3-5-sonnet-20241022"
 max_tokens = 400
@@ -12,14 +36,8 @@ max_tokens = 400
 temperature = 0.7
 base_url = "https://api.openai.com/v1"
 
-[system_prompts]
-proactive = "You are Blue, an ambient pair programming assistant. Provide helpful, conversational comments about code changes, focusing on security, performance, and architecture. Be specific and actionable."
-
-interactive = "You are Blue, a friendly coding assistant. Have natural conversations with developers, referencing their recent code changes and providing helpful advice."
-
-code_reviewer = "You are an expert code reviewer focusing on security, performance, and code quality. Provide concise, actionable feedback."
-
-architect = "You are a software architect focusing on system design and scalability. Provide high-level architectural insights."
+# System prompts are now loaded from blue/config/prompts.toml
+# This keeps prompts separate and easier to manage
 
 [limits]
 # Buffer and processing limits
@@ -37,13 +55,74 @@ max_buffer_age = 120
 # Dynamic decision making with LLM
 enable_llm_decision = true
 confidence_threshold = 7
-decision_prompt = """Changes: {changes}. Context: {context}. Good time for big-picture input? Answer: YES/NO, confidence 1-10."""
+# decision_prompt is now loaded from blue/config/prompts.toml
 
 # Adaptive learning from user feedback
 enable_adaptive_learning = true
 threshold_adjustment = 1
 min_score_threshold = 3
 max_score_threshold = 10
+
+# Scoring patterns (points awarded for different types of changes)
+[scoring]
+# Function/method definitions (high value)
+function_patterns = [
+    { pattern = "def ", points = 3, language = "python" },
+    { pattern = "function ", points = 3, language = "javascript" },
+    { pattern = "const .* = \\(", points = 3, language = "javascript" },
+    { pattern = "=> {", points = 2, language = "javascript" },
+    { pattern = "public class", points = 4, language = "java" },
+    { pattern = "private class", points = 4, language = "java" },
+    { pattern = "public static", points = 3, language = "java" },
+    { pattern = "func ", points = 3, language = "go" }
+]
+
+# Import/include statements (architectural significance)
+import_patterns = [
+    { pattern = "^import ", points = 2, language = "python" },
+    { pattern = "^from .* import", points = 2, language = "python" },
+    { pattern = "import.*from", points = 2, language = "javascript" },
+    { pattern = "require\\(", points = 2, language = "javascript" },
+    { pattern = "#include", points = 2, language = "c" }
+]
+
+# Security-related patterns (high priority)
+security_patterns = [
+    { pattern = "password", points = 3, language = "all" },
+    { pattern = "auth", points = 3, language = "all" },
+    { pattern = "token", points = 2, language = "all" },
+    { pattern = "encrypt", points = 3, language = "all" },
+    { pattern = "hash", points = 2, language = "all" },
+    { pattern = "sql", points = 2, language = "all" },
+    { pattern = "query", points = 2, language = "all" }
+]
+
+# Error handling patterns
+error_patterns = [
+    { pattern = "try:", points = 2, language = "python" },
+    { pattern = "except", points = 2, language = "python" },
+    { pattern = "catch", points = 2, language = "javascript" },
+    { pattern = "throw", points = 2, language = "all" },
+    { pattern = "error", points = 1, language = "all" }
+]
+
+# Test patterns
+test_patterns = [
+    { pattern = "test_", points = 2, language = "python" },
+    { pattern = "def test", points = 2, language = "python" },
+    { pattern = "it\\(", points = 2, language = "javascript" },
+    { pattern = "describe\\(", points = 2, language = "javascript" },
+    { pattern = "assert", points = 1, language = "all" }
+]
+
+# Minor change patterns (low or negative scores)
+minor_patterns = [
+    { pattern = "^\\s*#", points = 0, language = "all" },  # Comments
+    { pattern = "^\\s*//", points = 0, language = "all" },  # Comments  
+    { pattern = "print\\(", points = 0, language = "all" },  # Debug prints
+    { pattern = "console.log", points = 0, language = "javascript" },  # Debug logs
+    { pattern = "\\s+$", points = 0, language = "all" }  # Whitespace changes
+]
 
 [monitoring]
 supported_extensions = [".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".cpp", ".c", ".h", ".go", ".rs", ".php", ".rb", ".swift", ".kt", ".cs", ".vue", ".html", ".css", ".scss", ".sql", ".yaml", ".yml", ".json"]
